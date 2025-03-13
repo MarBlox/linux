@@ -1,1 +1,86 @@
 #For Debain 12
+
+#------Network------#
+nano /etc/network/interfaces
+auto ens34 
+iface ens34 inet static
+address 192.168.10.1/24
+dns-search skill39.wse 
+dns-nameservers 127.0.0.1
+systemctl restart networking.service
+#-----------------#
+
+#------SSH------#
+apt install ssh
+ssh-keygen
+cat id_rsa.pub > ./ssh/authorized_keys
+nano /etc/ssh/sshd_config
+  line 38 : PubkeyAuthentication yes
+  line 57 : PasswordAuthentication no
+systemctl restart sshd
+#-----------------#
+
+#------DHCP------#
+apt install isc-dhcp-server -y
+dpkg-reconfigure isc-dhcp-server (select the network interface for dhcp)
+nano /etc/dhcp/dhcpd.conf
+  line 7 : option domain-name "skill39.wse";
+  line 8 : option domain-name-servers 192.168.10.1;
+  line 35 : subnet 192.168.0.0 netmask 255.255.255.0 {
+  line 36 :   range 192.168.0.50 192.168.0.100;
+  line 37 :   option routers 192.168.0.1;
+  line 38 : }
+systemctl restart isc-dhcp-server.service
+#-----------------#
+
+#------DNS------#
+apt install bind9 -y
+cd /etc/bind
+nano named.conf.options
+  line 13 : forwarders {
+  line 14 :         8.8.8.8;
+  line 15 : };
+  line 21 : dnssec-validation no;
+  line 23 : listen-on-v6 { none; };
+cp db.local db.skill39.wse
+cp db.127 db.10.168.192
+nano db.skill39.wse
+  @       IN      SOA     skill39.wse. root.skill39.wse. (
+                                2         ; Serial
+                             604800         ; Refresh
+                            86400         ; Retry
+                          2419200         ; Expire
+                           604800 )       ; Negative Cache TTL
+  ;
+  @       IN      NS      fw.
+  @       IN      A       192.168.0.1
+  @       IN      A       192.168.10.1
+  fw      IN      A       192.168.0.1
+  fw      IN      A       192.168.10.1
+  site    IN      CNAME   fw.skill39.wse
+  apache  IN      CNAME   fw.skill39.wse
+nano db.10.168.192
+  @       IN      SOA     skill39.wse. root.skill39.wse. (
+                                1         ; Serial
+                           604800         ; Refresh
+                            86400         ; Retry
+                        2419200         ; Expire
+                           604800 )       ; Negative Cache TTL
+  ;
+  @       IN      NS      fw.
+  1       IN      PTR     fw.
+  1       IN      PTR     site.
+  1       IN      PTR     apache
+nano named.conf.local
+  zone "skill39.wse" {
+          type master;
+          file "/etc/bind/db.skill39.wse";
+          allow-update { none;};
+  };
+
+  zone "10.168.192.in-addr.arpa" {
+          type master;
+          file "/etc/bind/db.10.168.192";
+          allow-update { none;};
+  };
+#-----------------#
