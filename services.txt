@@ -57,8 +57,8 @@ nano db.skill39.wse
   @       IN      A       192.168.10.1
   fw      IN      A       192.168.0.1
   fw      IN      A       192.168.10.1
-  site    IN      CNAME   fw.skill39.wse
-  apache  IN      CNAME   fw.skill39.wse
+  site    IN      CNAME   fw.
+  apache  IN      CNAME   fw.
 nano db.10.168.192
   @       IN      SOA     skill39.wse. root.skill39.wse. (
                                 1         ; Serial
@@ -70,17 +70,18 @@ nano db.10.168.192
   @       IN      NS      fw.
   1       IN      PTR     fw.
   1       IN      PTR     site.
-  1       IN      PTR     apache
+  1       IN      PTR     apache.
 nano named.conf.local
   zone "skill39.wse" {
           type master;
           file "/etc/bind/db.skill39.wse";
-          allow-update { none;};
+          allow-update { none; };
   };
 
   zone "10.168.192.in-addr.arpa" {
           type master;
           file "/etc/bind/db.10.168.192";
-          allow-update { none;};
+          allow-update { none; };
   };
+  systemctl restart named.service
 #-----------------#
