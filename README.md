@@ -1,2 +1,2 @@
 # linux
-Linux Services Configs
+All necessary configs for your linux server services administration
