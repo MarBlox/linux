@@ -88,6 +88,12 @@ nano named.conf.local
   chattr +i /etc/resolv.conf
 #-----------------#
 
+#------OPENSSL------#
+cd /etc/openssl
+touch index.html
+echo 1000 > serial
+#-----------------#
+
 #------HAPROXY------#
 apt install haproxy
 nano /etc/haproxy/haproxy.cfg
