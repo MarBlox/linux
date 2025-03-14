@@ -84,4 +84,12 @@ nano named.conf.local
           allow-update { none; };
   };
   systemctl restart named.service
+  nano /etc/resolv.conf
+  chattr +i /etc/resolv.conf
+#-----------------#
+
+#------HAPROXY------#
+apt install haproxy
+nano /etc/haproxy/haproxy.cfg
+
 #-----------------#
