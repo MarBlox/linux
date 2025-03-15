@@ -101,7 +101,34 @@ nano named.conf.local
 #------HAPROXY------#
   apt install haproxy
   nano /etc/haproxy/haproxy.cfg
+  cop site.crt site.key > site.pem
+  frontend site_front
+          bind *:443 ssl crt site.pem
+          acl is_site hdr(host) -i site.skill39.wse
+          acl is_apache2 hdr(host) -i apache2.skill39.wse
+  
+          use_backend site_back if is_site
+          use_backend apache2_back if is_apache2
 
+  backend site_back
+          balance roundrobin
+          server server1 192.168.10.2:8080 check
+          server server2 192.168.10.3:8080 check
+
+  backend apache2_back
+          balance roundrobin
+          server server1 192.168.10.4:8080 check
+
+  #OR
+
+  frontend site_front
+          bind *:443 ssl crt site.pem
+          default_backend site_back
+
+  backend site_back
+          balance roundrobin
+          server server1 192.168.10.2:8080 check
+          server server2 192.168.10.3:8080 check
 #-----------------#
 
 #------LDAP------#
