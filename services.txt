@@ -137,3 +137,30 @@ nano named.conf.local
   
   ldapadd -x -D "cn=admin,dc=skill39,dc=wse" -W -f base.ldif #Insert config from LDAP
 #-----------------#
+
+#------WIREGUARD------#
+  apt install wireguard
+  #On Server
+  wg genkey | tee privatekey | wg pubkey> publickey
+  nano /etc/wireguard/wg0.conf
+    [Interface]
+    PrivateKey=(Generted Private Key)
+    Address=10.0.0.1/24(The network of wireguard vpn)
+    SaveConfig=true
+    ListenPort = 51820 (Default Port WireGuard)
+  #On Client
+  wg genkey | tee privatekey | wg pubkey> publickey
+  nano /etc/wireguard/wg0.conf
+  [Interface]
+  PrivateKey = <client-private-key>
+  Address = <client-ip-address>/<subnet>
+  SaveConfig = true
+
+  [Peer]
+  PublicKey = (server-public-key)
+  Endpoint = (server-public-ip-address):51820
+  AllowedIPs = (0.0.0.0/0 for all trafic go on vpn or select network id for only specify trafic go on vpn)
+
+  #On Server
+  wg set wg0 peer (client-public-key) allowed-ips (client-ip-address)/32
+#-----------------#
