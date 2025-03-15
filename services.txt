@@ -107,4 +107,33 @@ nano named.conf.local
 #------LDAP------#
   apt install sladp ldap-utils
   dpkg-reconfigure slapd
+  slappasswd #Create a Encrypted Password
+  slapcat #Show LDAP Configuration
+  touch base.ldif
+    #Make a Organizational Unit
+    dn: ou=Network Admins,dc=skill39,dc=wse
+    objectClass: organizationalUnit
+      ou: Network Admins
+
+    #Make a Group
+    dn: cn=superusers;ou=Network Admins,dc=skill39,dc=wse
+    objectClass: posixGroup
+    cn: superusers
+    gidNumber: 5001
+
+    #Make a User
+    dn: uid=admin,ou=Network Admins,dc=skill39,dc=wse
+    objectClass: top
+    objectClass: inetOrgPerson
+    objectClass: posixAccount
+    cn: admin
+    uid: admin
+    uidNumber: 10000
+    gidNumber: 5000
+    homeDirectory: /share/users/admin
+    loginShell: /bin/bash
+    mail: admin@skill39.wse
+    userPassword: {SSHA}E+0WFKaDp1eCRm4kEOS/+7r00/y9mxQb
+  
+  ldapadd -x -D "cn=admin,dc=skill39,dc=wse" -W -f base.ldif #Insert config from LDAP
 #-----------------#
