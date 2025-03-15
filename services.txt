@@ -90,8 +90,12 @@ nano named.conf.local
 
 #------OPENSSL------#
 cd /etc/openssl
-touch index.html
-echo 1000 > serial
+nano openssl.cnf
+openssl genrsa -out ca.key 4096
+openssl req -x509 -new -nodes -key ca.key -sha256 -days 3560 -out ca.pem -config opessl.cnf
+openssl genrsa -out /etc/private/site.key 2048 #gen key for site called site
+openssl req -new -key /etc/ssl/private/site.key -out /etc/ssl/certs/site.csr -subj "/CN=site.skill39.wse/O=WSE/C=PT" #make a request for certificate
+openssl x509 -req -in /etc/ssl/certs/site.csr -CA ca.pem -CAkey ca.key -CAcreateserial -out /etc/ssl/certs/site.crt -day 365 -sha256 -extfile <(echo "subjectAltName=DNS:site.skill39.wse") #sign certs
 #-----------------#
 
 #------HAPROXY------#
